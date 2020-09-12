@@ -230,3 +230,32 @@ for i in ages:
     
 for i in ages:
     category(i).to_csv("c:/data/zigzag/category_{}.csv".format(i))
+    
+    
+#연관분석
+    
+df = pd.merge(order,shop,on = 'shop_id')
+df
+style_list = ['페미닌', '모던시크', '심플베이직', '러블리', '유니크', '미시스타일', '캠퍼스룩', '빈티지', '섹시글램', '스쿨룩', '로맨틱', '오피스룩',
+              '럭셔리', '헐리웃스타일', '심플시크', '키치', '펑키', '큐티', '볼드&에스닉' ]
+for style in style_list:
+    shop[f"{style}"] = shop['style'].str.contains(style)
+    
+merged = (
+    order.merge(shop, on='shop_id')
+             .merge(user, on='user_id')
+)
+print(merged.shape)
+merged.head(3)
+
+recommend_df = merged.iloc[:,9:-2]
+recommend_df=recommend_df.fillna(False)
+
+
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+
+f = apriori(recommend_df, min_support=0.05, use_colnames=True)
+f.sort_values('support',ascending = False)
+association_rules(f,metric = 'confidence',min_threshold=0.3)
+
